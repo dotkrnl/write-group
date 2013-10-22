@@ -1,0 +1,26 @@
+extends layout
+
+block body
+
+    div#header
+        block header
+            h1#logo
+                if (typeof(title) != 'undefined')
+                    block logo_link
+                        a(href="/")#title #{website} #{title}
+                else  
+                    a(href="/")#title #{website} group
+        block notification
+            if (typeof(message.error) != 'undefined')
+                for mesg in message.error
+                    div.message= mesg
+            if (typeof(message.success) != 'undefined')
+                for mesg in message.success
+                    div.message= mesg
+
+    div#content
+        block content
+
+    div#footer
+        block footer
+            © 2013 dotkrnl

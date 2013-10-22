@@ -1,0 +1,14 @@
+extends style
+
+append content
+    div.message
+        |Enter your fullname to join writing.
+    br
+    form#form(action="#",method="post")
+        div
+            label Fullname
+            input#user(type="text", name="user")
+        div
+            input.button(type="submit", value="Write!")
+    .note
+        |You can share this link for grouping.

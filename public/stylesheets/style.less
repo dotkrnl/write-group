@@ -1,0 +1,175 @@
+@import "reset.css";
+
+@link-color:    #999999;
+@header-color:  #333333;
+@text-color:    #555555;
+@background:    #fcfcfc;
+@emphasize:     #4e8ca6;
+
+@smallscreen:   960px;
+@mobilescreen:  600px;
+
+body {
+    @padding-right:     3.0em;
+    @padding-other:     2.0em;
+    @ls-mul:            2.0;
+    @ms-mul:            0.3;
+    padding:
+        (@padding-other * @ls-mul) (@padding-right * @ls-mul)
+        (@padding-other * @ls-mul) (@padding-other * @ls-mul);
+    @media screen and (max-width: @smallscreen) {
+        padding:
+            @padding-other @padding-right
+            @padding-other @padding-other;
+    }
+    @media screen and (max-width: @mobilescreen) {
+        padding:
+            (@padding-other * @ms-mul) (@padding-right * @ms-mul)
+            (@padding-other * @ms-mul) (@padding-other * @ms-mul);
+    }
+
+    max-width: 800px;
+    color: @text-color;
+    background-color: @background;
+    font: 1em 
+        "Lucida Grande", Helvetica, Arial, "Droid Sans",
+        "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+}
+
+@base-margin:   0.3em;
+@h2-mul:        0.75;
+@h3-mul:        0.5;
+h1 {
+    margin: @base-margin 0 @base-margin 0;
+    font-size: 2.5em;
+}
+h2 {
+    margin: (@base-margin * @h2-mul) 0 (@base-margin * @h2-mul) 0;
+    font-size: 1.5em;
+}
+h3 {
+    margin: (@base-margin * @h3-mul) 0 (@base-margin * @h3-mul) 0;
+    font-size: 1.17em;
+}
+
+a {
+    color: @link-color;
+    text-decoration: none;
+}
+
+h1, h2, h3 {
+    color: @header-color;
+}
+
+p, pre {
+    margin: 1em 0 1em 0;
+}
+
+strong, em {
+    color: @emphasize;
+}
+
+input, textarea, select {
+    background-color: #f7f7f7;
+    border: 0;
+    width: 12em;
+    padding: 0.6em;
+    margin: 0.1em 0 0.1em 0;
+    font-size: 1em;
+    -webkit-appearance: none;
+}
+
+textarea {
+    min-width: 80%;
+    height: 10em;
+    margin-top: 1em;
+}
+
+select {
+    width: (12em + 0.6em * 2);
+}
+
+#nav {
+    font-size: 0.9em;
+}
+.nav_item {
+    text-transform: uppercase;
+    display: inline;
+    margin: 0 0.8em 0 0;
+}
+
+#content {
+    padding: 2em 0 2em 0;
+    @media screen and (max-width: @mobilescreen) {
+        padding: 0;
+    }
+}
+
+.button {
+    color: white;
+    background-color: #777;
+    margin-top: 1.5em;
+    margin-right: 0.5em;
+    padding: 0.6em;
+}
+
+label {
+    padding: 0 0.5em 0 0;
+}
+
+.message {
+    color: white;
+    background-color: #4e8ca6;
+    padding: 0.8em;
+    margin-top: 1em;
+}
+
+.autoimg {
+    max-width: 100%;
+}
+
+.note, #footer {
+    font-size: 0.6em;
+    padding: 0.5em 0 0.5em 0;
+}
+
+table {
+    width: 95%;
+    margin-top: 1em;
+}
+
+td {
+    background: #f7f7f7;
+    padding: 0.9em;
+}
+
+.list_info_mine {
+    color: white;
+    background-color: #777;
+}
+
+#lrnav_bar {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.lrnav {
+    padding-right: 2em;
+}
+
+img {
+    max-width: 100%;
+}
+
+#contentbox {
+    width: 50%;
+    height: 1.5em;
+    min-width: 20em;
+}
+
+#contentsubmit {
+    margin: 0;
+    width: 5em;
+    background-color: #f7f7f7;
+    color: @link-color;
+}

@@ -1,0 +1,15 @@
+extends style
+
+block content
+    form#form(action="#",method="post")
+        div
+            label Name
+            input#name(type="text", value="#{form.name || ''}", name="name")
+
+        div
+            label Email
+            input#email(type="text", value="#{form.email || ''}", name="email")
+
+        div
+            input.button(type="submit", value="Write!")
+

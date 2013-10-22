@@ -1,0 +1,16 @@
+extends style
+
+append content
+    br
+    div
+        a(href="/new").button new group
+    br
+    p
+        |$ sudo emerge -qa write-with-group<br/>
+        |$ write --new-group meow<br/>
+        |> your group `meow' secret is `HzMil2U'<br/>
+        |$ echo "Hello, meow" | write meow/dotkrnl<br/>
+    p
+        |Message from dotkrnl@meow at 17:10 ...<br/>
+        |Hello, meow<br/>
+        |EOF<br/>
