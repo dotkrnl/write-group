@@ -13,7 +13,7 @@ function genncb(serverURL) {
         var xhr = createXHR();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4)
-                if (xhr.responseText == 1)
+                if (xhr.responseText == 1 && document.getElementById("contentbox").value == '')
                     location.reload(true);
         }
         localtime = Number(Date.now());
