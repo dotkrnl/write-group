@@ -67,7 +67,7 @@ exports.show = function(req, res) {
             mesg.find({group: name}).sort('-create').skip(skip).limit(settings.perpage)
                 .find(function(err, mesglist){
                     var newlist = []
-                    info.timestamp = mesglist ? Number(mesglist[0].create) : 0;
+                    info.timestamp = mesglist[0] ? Number(mesglist[0].create) : 0;
                     mesglist.forEach(function(item) {
                         var newitem = {
                             content: md(item.content),
