@@ -4,7 +4,7 @@ append head
     script(src='/javascripts/getnotification.js').
     script(type='text/javascript').
         window.onload = function () {
-            setInterval(genncb("/w/#{name}/#{secret}/#{user}/notification?timestamp=#{timestamp}"), 5000);
+            window.setInterval(genncb("/w/#{name}/#{secret}/#{user}/notification?timestamp=#{timestamp}"), 5000);
         }
 
 block logo_link
