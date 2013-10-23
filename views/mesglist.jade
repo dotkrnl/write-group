@@ -6,7 +6,7 @@ block logo_link
 append content
     form#form(action="#",method="post")
         input#contentbox(name="content")
-        input.button#contentsubmit(type="submit", value="write!")
+        input.button.contentbutton(type="submit", value="write!")
 
     table.list
         for mesg in mesglist

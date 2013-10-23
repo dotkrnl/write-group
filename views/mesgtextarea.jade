@@ -1,0 +1,14 @@
+extends style
+
+block logo_link
+    a(href="/w/#{name}/#{secret}/#{user}/")#title #{website} #{title}
+
+append content
+    form#form(action="#",method="post")
+        div
+            textarea#contentbox(name="content")
+        div
+            input.button.contentbutton(type="submit", value="write!")
+    #lrnav_bar
+        a.lrnav(href='/w/#{name}/#{secret}/#{user}/') << back
+    

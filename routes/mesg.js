@@ -86,12 +86,14 @@ exports.send = function (req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
     var user = req.params.user;
+    var info = {title: name, name: name, secret: secret, user: user};
     var fallback = function(err) {
         req.flash('error', err);
         return res.redirect('back');
     }
     checkSecret(name, secret, function(err) {
         if (err) return fallback(err);
+        if (!req.body.content) return res.render('mesgtextarea', info);
         mesg.findOne().sort('-id').exec(function(err, last) {
             var item = new mesg(req.body);
             item.id = last ? last.id + 1 : 0;
