@@ -21,6 +21,8 @@ module.exports = function(app) {
     app.get('/w/:name/:secret/:user/page/:page(\\d+)', mesg.show);
     app.post('/w/:name/:secret/:user', mesg.send);
     app.post('/w/:name/:secret/:user/page/:page(\\d+)', mesg.send);
+    
+    app.get('/w/:name/:secret/:user/notification', mesg.notification);
 
     app.get('/test', test);
     app.get('*', function(req, res){

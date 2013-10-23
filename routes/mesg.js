@@ -67,6 +67,7 @@ exports.show = function(req, res) {
             mesg.find({group: name}).sort('-create').skip(skip).limit(settings.perpage)
                 .find(function(err, mesglist){
                     var newlist = []
+                    info.timestamp = mesglist ? Number(mesglist[0].create) : 0;
                     mesglist.forEach(function(item) {
                         var newitem = {
                             content: md(item.content),
@@ -110,3 +111,15 @@ exports.send = function (req, res) {
     });
 };
 
+exports.notification = function(req, res) {
+    var name = req.params.name;
+    var secret = req.params.secret;
+    if (!req.query.timestamp) return res.send('0');
+    checkSecret(name, secret, function(err) {
+        if (err) return res.send('0');
+        mesg.findOne({group: name}).sort('-create').exec(function(err, last) {
+            if (err || Number(last.create) <= Number(req.query.timestamp)) return res.send('0');
+            else return res.send('1');
+        });
+    });
+}
