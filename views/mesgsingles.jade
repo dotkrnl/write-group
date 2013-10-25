@@ -1,0 +1,13 @@
+table.list
+    for mesg in mesglist
+        tr.list_item
+            - if (mesg.author == user) 
+                td.list_info_mine
+                    !{mesg.content}
+                    .note= mesg.author
+                         @#{mesg.create}
+            - else
+                td.list_info
+                    !{mesg.content}
+                    .note= mesg.author
+                        @#{mesg.create}

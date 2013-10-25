@@ -18,6 +18,26 @@ var checkSecret = function(name, secret, cb) {
     });
 };
 
+var getAndRenderMessage = function(name, skip, limit, res, info, cb) {
+    mesg.find({group: name}).sort('-create').skip(skip).limit(limit)
+        .find(function(err, mesglist) {
+            var items = [];
+            var latest = mesglist[0] ?  Number(mesglist[0].create) : 0;
+            mesglist.forEach(function(item) {
+                var newitem = {
+                    content: md(item.content),
+                    create: moment(item.create).format("MM/DD HH:mm"),
+                    author: item.author
+                };
+                items.push(newitem);
+            });
+            info.mesglist = items;
+            res.render('mesgsingles', info, function(err, html) {
+                return cb(html, latest);
+            });
+        });
+};
+
 exports.welcome = function(req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
@@ -64,24 +84,12 @@ exports.show = function(req, res) {
             }
             info.totpage = Math.ceil(count / settings.perpage);
             var skip = settings.perpage * (page - 1);
-            mesg.find({group: name}).sort('-create').skip(skip).limit(settings.perpage)
-                .find(function(err, mesglist){
-                    var newlist = []
-                    if (page == 1)
-                        info.timestamp = mesglist[0] ?
-                            Number(mesglist[0].create) : 0;
-                    else info.timestamp = Number(Date.now());
-                    mesglist.forEach(function(item) {
-                        var newitem = {
-                            content: md(item.content),
-                            create: moment(item.create).format("MM/DD HH:mm"),
-                            author: item.author
-                        };
-                        newlist.push(newitem);
-                    });
-                    info.mesglist = newlist;
-                    return res.render('mesglist', info);
-                });
+
+            getAndRenderMessage(name, skip, settings.perpage, res, info, function(html, latest) {
+                info.timestamp = page == 1 ? latest : Number(Date.now());
+                info.mesgsingles = html;
+                return res.render('mesglist', info);
+            });
         });
     });
 };
