@@ -18,6 +18,20 @@ var checkSecret = function(name, secret, cb) {
     });
 };
 
+var getMessageInfo = function(mesglist, cb) {
+    var newlist = [];
+    mesglist.forEach(function(item) {
+        var newitem = {
+            content: md(item.content),
+            create: moment(item.create).format("MM/DD HH:mm"),
+            author: item.author,
+            id: item.id
+        };
+        newlist.push(newitem);
+    });
+    return newlist;
+};
+
 exports.welcome = function(req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
@@ -66,20 +80,10 @@ exports.show = function(req, res) {
             var skip = settings.perpage * (page - 1);
             mesg.find({group: name}).sort('-create').skip(skip).limit(settings.perpage)
                 .find(function(err, mesglist){
-                    var newlist = []
                     if (page == 1)
-                        info.timestamp = mesglist[0] ?
-                            Number(mesglist[0].create) : 0;
-                    else info.timestamp = Number(Date.now());
-                    mesglist.forEach(function(item) {
-                        var newitem = {
-                            content: md(item.content),
-                            create: moment(item.create).format("MM/DD HH:mm"),
-                            author: item.author
-                        };
-                        newlist.push(newitem);
-                    });
-                    info.mesglist = newlist;
+                        info.lastid = mesglist[0] ?
+                            Number(mesglist[0].id) : -1;
+                    info.mesglist = getMessageInfo(mesglist);
                     return res.render('mesglist', info);
                 });
         });
@@ -114,15 +118,19 @@ exports.send = function (req, res) {
     });
 };
 
-exports.notification = function(req, res) {
+exports.getmessage = function(req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
-    if (!req.query.timestamp) return res.send('0');
+    if (!req.query.lastid) return res.send({err: 'no lastid', data: []});
     checkSecret(name, secret, function(err) {
-        if (err) return res.send('0');
-        mesg.findOne({group: name}).sort('-create').exec(function(err, last) {
-            if (err || Number(last.create) <= Number(req.query.timestamp)) return res.send('0');
-            else return res.send('1');
+        if (err) return res.send({err: err, data: []});
+        mesg.find({group: name, id: {$gt: req.query.lastid}})
+            .sort('create').exec(function(err, newmesg) {
+                if (err) return res.send({err: err, data: []});
+                else {
+                    var mesglist = getMessageInfo(newmesg);
+                    return res.send({err: false, data: mesglist});
+                }
         });
     });
-}
+};

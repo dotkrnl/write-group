@@ -1,11 +1,13 @@
 extends style
 
 append head
-    script(src='/javascripts/getnotification.js').
-    script(type='text/javascript').
-        window.onload = function () {
-            window.setInterval(genncb("/w/#{name}/#{secret}/notification?timestamp=#{timestamp}"), 5000);
-        }
+    - if (lastid)
+        script(src='/javascripts/json.js').
+        script(src='/javascripts/getmesg.js').
+        script(type='text/javascript').
+            window.onload = function () {
+                setupNotification("/w/#{name}/#{secret}/getmessage", #{lastid}, "#{user}");
+            }
 
 block logo_link
     a(href="/w/#{name}/#{secret}/#{user}/")#title #{website} #{title}
@@ -15,7 +17,7 @@ append content
         input#contentbox(name="content")
         input.button.contentbutton(type="submit", value="write!")
 
-    table.list
+    table.list#mesglist
         for mesg in mesglist
             tr.list_item
                 - if (mesg.author == user) 

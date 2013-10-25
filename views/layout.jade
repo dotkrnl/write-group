@@ -4,10 +4,10 @@ html(lang='zh-CN')
         block head
             meta(charset="utf-8")
             meta(name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no")
-        if (typeof(title) != 'undefined')
-            title #{website} #{title}
-        else  
-            title #{website} group
-        link(rel='stylesheet', href='/stylesheets/style.css')
+            if (typeof(title) != 'undefined')
+                title #{website} #{title}
+            else  
+                title #{website} group
+            link(rel='stylesheet', href='/stylesheets/style.css')
     body
         block body
