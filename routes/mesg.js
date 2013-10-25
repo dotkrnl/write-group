@@ -80,6 +80,10 @@ exports.show = function(req, res) {
             var skip = settings.perpage * (page - 1);
             mesg.find({group: name}).sort('-create').skip(skip).limit(settings.perpage)
                 .find(function(err, mesglist){
+                    if (err) {
+                        console.log(err);
+                        return fallback('Database error');
+                    }
                     if (page == 1)
                         info.lastid = mesglist[0] ?
                             Number(mesglist[0].id) : -1;
