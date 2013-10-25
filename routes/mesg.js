@@ -121,6 +121,7 @@ exports.notification = function(req, res) {
     checkSecret(name, secret, function(err) {
         if (err) return res.send('0');
         mesg.findOne({group: name}).sort('-create').exec(function(err, last) {
+            if (!last) return res.send('0');
             if (err || Number(last.create) <= Number(req.query.timestamp)) return res.send('0');
             else return res.send('1');
         });
