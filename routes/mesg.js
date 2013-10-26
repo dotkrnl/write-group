@@ -18,11 +18,11 @@ var checkSecret = function(name, secret, cb) {
     });
 };
 
-var getAndRenderMessage = function(name, skip, limit, res, info, cb) {
-    mesg.find({group: name}).sort('-create').skip(skip).limit(limit)
+var getAndRenderMessage = function(condition, skip, limit, res, info, cb) {
+    mesg.find(condition).sort('-create').skip(skip).limit(limit)
         .find(function(err, mesglist) {
             var items = [];
-            var latest = mesglist[0] ?  Number(mesglist[0].create) : 0;
+            var latest = mesglist[0] ? mesglist[0].id : 0;
             mesglist.forEach(function(item) {
                 var newitem = {
                     content: md(item.content),
@@ -33,7 +33,7 @@ var getAndRenderMessage = function(name, skip, limit, res, info, cb) {
             });
             info.mesglist = items;
             res.render('mesgsingles', info, function(err, html) {
-                return cb(html, latest);
+                return cb(items.length, html, latest);
             });
         });
 };
@@ -85,8 +85,8 @@ exports.show = function(req, res) {
             info.totpage = Math.ceil(count / settings.perpage);
             var skip = settings.perpage * (page - 1);
 
-            getAndRenderMessage(name, skip, settings.perpage, res, info, function(html, latest) {
-                info.timestamp = page == 1 ? latest : Number(Date.now());
+            getAndRenderMessage({group: name}, skip, settings.perpage, res, info, function(count, html, latest) {
+                info.latest = page == 1 ? latest : -1;
                 info.mesgsingles = html;
                 return res.render('mesglist', info);
             });
@@ -101,11 +101,12 @@ exports.send = function (req, res) {
     var info = {title: name, name: name, secret: secret, user: user};
     var fallback = function(err) {
         req.flash('error', err);
-        return res.redirect('back');
+        return res.json(err);
     }
     checkSecret(name, secret, function(err) {
         if (err) return fallback(err);
-        if (!req.body.content) return res.render('mesgtextarea', info);
+        if (!req.body.content) return res.json("no content");
+        //if (!req.body.content) return res.render('mesgtextarea', info);
         mesg.findOne().sort('-id').exec(function(err, last) {
             var item = new mesg(req.body);
             item.id = last ? last.id + 1 : 0;
@@ -116,22 +117,23 @@ exports.send = function (req, res) {
                     console.log(err);
                     fallback('Unknown error');
                 }
-                return res.redirect('back');
+                return res.json("success");
             });
         });
     });
 };
 
-exports.notification = function(req, res) {
+exports.pullmesg = function(req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
-    if (!req.query.timestamp) return res.send('0');
+    var user = req.params.user;
+    var info = {title: name, name: name, secret: secret, user: user};
+    if (!req.query.latest) return res.json({count: 0});
+    var reqid = Number(req.query.latest);
     checkSecret(name, secret, function(err) {
-        if (err) return res.send('0');
-        mesg.findOne({group: name}).sort('-create').exec(function(err, last) {
-            if (!last) return res.send('0');
-            if (err || Number(last.create) <= Number(req.query.timestamp)) return res.send('0');
-            else return res.send('1');
+        if (err) return res.json({count: 0});
+        getAndRenderMessage({group: name, id: {$gt: reqid}}, 0, settings.perpage, res, info, function(count, html, latest) {
+            return res.json({count: count, html: html, latest: count ? latest : reqid, request: reqid});
         });
     });
 }

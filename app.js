@@ -13,7 +13,7 @@ var flash = require('connect-flash');
 var app = express();
 
 // all environments
-app.set('host', '127.0.0.1');
+app.set('host', '0.0.0.0');
 app.set('port', process.env.PORT || settings.defaultPort);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
