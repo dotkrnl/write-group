@@ -1,23 +1,21 @@
 extends style
 
 append head
-    - if (lastid)
-        script(src='/javascripts/json.js').
-        script(src='/javascripts/getmesg.js').
-        script(type='text/javascript').
-            window.onload = function () {
-                setupNotification("/w/#{name}/#{secret}/getmessage", #{lastid}, "#{user}");
-            }
+    script(src='/javascripts/getnotification.js').
+    script(type='text/javascript').
+        window.onload = function () {
+            window.setInterval(genncb("/w/#{name}/#{secret}/notification?timestamp=#{timestamp}"), 5000);
+        }
 
 block logo_link
     a(href="/w/#{name}/#{secret}/#{user}/")#title #{website} #{title}
 
 append content
     form#form(action="#",method="post")
-        input#contentbox(name="content", autocomplete="off")
+        input#contentbox(name="content")
         input.button.contentbutton(type="submit", value="write!")
 
-    table.list#mesglist
+    table.list
         for mesg in mesglist
             tr.list_item
                 - if (mesg.author == user) 
