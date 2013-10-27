@@ -17,12 +17,11 @@ module.exports = function(app) {
     app.get('/w/:name/:secret', mesg.welcome);
     app.post('/w/:name/:secret', mesg.redirect);
 
-    app.get('/w/:name/:secret/notification', mesg.notification);
-
     app.get('/w/:name/:secret/:user', mesg.show);
     app.get('/w/:name/:secret/:user/page/:page(\\d+)', mesg.show);
     app.post('/w/:name/:secret/:user', mesg.send);
     app.post('/w/:name/:secret/:user/page/:page(\\d+)', mesg.send);
+    app.get('/w/:name/:secret/:user/mesg.json', mesg.pullmesg);
 
     app.get('/test', test);
     app.get('*', function(req, res){

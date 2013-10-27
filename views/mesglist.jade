@@ -1,36 +1,25 @@
 extends style
 
-append head
-    script(src='/javascripts/getnotification.js').
-    script(type='text/javascript').
-        window.onload = function () {
-            window.setInterval(genncb("/w/#{name}/#{secret}/notification?timestamp=#{timestamp}"), 5000);
-        }
-
 block logo_link
     a(href="/w/#{name}/#{secret}/#{user}/")#title #{website} #{title}
 
 append content
-    form#form(action="#",method="post")
-        input#contentbox(name="content")
-        input.button.contentbutton(type="submit", value="write!")
+    form#form(action="#",method="post",name="form")
+        input#contentbox(name="content", autocomplete="off")
+        input.button.contentbutton(type="submit", value="write!", name="btn")
 
     table.list
-        for mesg in mesglist
-            tr.list_item
-                - if (mesg.author == user) 
-                    td.list_info_mine
-                        !{mesg.content}
-                        .note= mesg.author
-                             @#{mesg.create}
-                - else
-                    td.list_info
-                        !{mesg.content}
-                        .note= mesg.author
-                            @#{mesg.create}
+        tbody#mesglist
+            !{mesgsingles}
+
     #lrnav_bar
         - if (page != 1)
             a(href='/w/#{name}/#{secret}/#{user}/page/#{page-1}').lrnav << new
         - if (page < totpage)
             a(href='/w/#{name}/#{secret}/#{user}/page/#{page+1}').lrnav old >>
 
+append scripts
+    if (latest != -1)
+        script(src='/javascripts/mesg.js').
+        script.
+            updater.setup("/w/#{name}/#{secret}/#{user}/mesg.json", "#{latest}");
