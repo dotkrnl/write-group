@@ -39,7 +39,7 @@ document.form.onsubmit = function(e) {
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             var res = eval("(" + xhr.responseText + ")");
-            if (res == "success") {
+            if (!res.err) {
                 document.form.content.value = "";
                 updater.refreshOnce(); //TODO: updater.refresh();
             }

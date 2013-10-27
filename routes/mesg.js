@@ -18,22 +18,27 @@ var checkSecret = function(name, secret, cb) {
     });
 };
 
-var getAndRenderMessage = function(condition, skip, limit, res, info, cb) {
+var getMessageInfo = function(mesglist, cb) {
+    var newlist = [];
+    mesglist.forEach(function(item) {
+        var newitem = {
+            content: md(item.content),
+            create: moment(item.create).format("MM/DD HH:mm"),
+            author: item.author,
+            id: item.id
+        }; newlist.push(newitem);
+    });
+    return newlist;
+};
+
+var renderMessages = function(condition, skip, limit, res, info, cb) {
     mesg.find(condition).sort('-create').skip(skip).limit(limit)
         .find(function(err, mesglist) {
-            var items = [];
+            if (err) cb(err);
             var latest = mesglist[0] ? mesglist[0].id : 0;
-            mesglist.forEach(function(item) {
-                var newitem = {
-                    content: md(item.content),
-                    create: moment(item.create).format("MM/DD HH:mm"),
-                    author: item.author
-                };
-                items.push(newitem);
-            });
-            info.mesglist = items;
+            info.mesglist = getMessageInfo(mesglist);
             res.render('mesgsingles', info, function(err, html) {
-                return cb(items.length, html, latest);
+                return cb(null, mesglist.length, html, latest);
             });
         });
 };
@@ -72,20 +77,19 @@ exports.show = function(req, res) {
     var info = {title: name, name: name, secret: secret, user: user};
     var page = info.page = Number(req.params.page || '1');
     var fallback = function(err) {
+        console.log(err);
         req.flash('error', err);
         return res.redirect('/');
     }
     checkSecret(name, secret, function(err) {
         if (err) return fallback(err);
         mesg.find({group: name}).count(function(err, count) {
-            if (err) {
-                console.log(err);
-                return fallback('Database error');
-            }
+            if (err) return fallback('Database error');
             info.totpage = Math.ceil(count / settings.perpage);
             var skip = settings.perpage * (page - 1);
 
-            getAndRenderMessage({group: name}, skip, settings.perpage, res, info, function(count, html, latest) {
+            renderMessages({group: name}, skip, settings.perpage, res, info, function(err, count, html, latest) {
+                if (err) fallback(err);
                 info.latest = page == 1 ? latest : -1;
                 info.mesgsingles = html;
                 return res.render('mesglist', info);
@@ -100,24 +104,20 @@ exports.send = function (req, res) {
     var user = req.params.user;
     var info = {title: name, name: name, secret: secret, user: user};
     var fallback = function(err) {
+        console.log(err);
         req.flash('error', err);
-        return res.json(err);
+        return res.send({err: err});
     }
     checkSecret(name, secret, function(err) {
         if (err) return fallback(err);
-        if (!req.body.content) return res.json("no content");
-        //if (!req.body.content) return res.render('mesgtextarea', info);
+        if (!req.body.content) return res.send({err: "No content"});
         mesg.findOne().sort('-id').exec(function(err, last) {
             var item = new mesg(req.body);
             item.id = last ? last.id + 1 : 0;
-            item.author = user;
-            item.group = name;
+            item.author = user; item.group = name;
             item.save(function(err) {
-                if (err) {
-                    console.log(err);
-                    fallback('Unknown error');
-                }
-                return res.json("success");
+                if (err) fallback('Database error');
+                return res.send({err: null});
             });
         });
     });
@@ -128,12 +128,12 @@ exports.pullmesg = function(req, res) {
     var secret = req.params.secret;
     var user = req.params.user;
     var info = {title: name, name: name, secret: secret, user: user};
-    if (!req.query.latest) return res.json({count: 0});
+    if (!req.query.latest) return res.send({count: 0});
     var reqid = Number(req.query.latest);
     checkSecret(name, secret, function(err) {
-        if (err) return res.json({count: 0});
-        getAndRenderMessage({group: name, id: {$gt: reqid}}, 0, settings.perpage, res, info, function(count, html, latest) {
-            return res.json({count: count, html: html, latest: count ? latest : reqid, request: reqid});
+        if (err) return res.send({err: err, count: 0});
+        renderMessages({group: name, id: {$gt: reqid}}, 0, settings.perpage, res, info, function(err, count, html, latest) {
+            return res.send({err: err, count: count, html: html, latest: count ? latest : reqid, request: reqid});
         });
     });
 }
