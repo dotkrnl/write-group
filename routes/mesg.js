@@ -9,6 +9,7 @@ var group = require('../models/group');
 var mesg = require('../models/mesg');
 var md = require('markdown').markdown.toHTML;
 var moment = require('moment');
+var querystring = require("querystring");
 
 var checkSecret = function(name, secret, cb) {
     group.findOne({name: name}, function(err, found) {
@@ -61,6 +62,7 @@ exports.redirect = function(req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
     var user = req.body.user;
+    var escapeU = querystring.escape(user);
     if (user == '') {
         req.flash('error', 'Fullname needed');
         return res.redirect('back');
@@ -74,7 +76,8 @@ exports.show = function(req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
     var user = req.params.user;
-    var info = {title: name, name: name, secret: secret, user: user};
+    var escapeU = querystring.escape(user);
+    var info = {title: name, name: name, secret: secret, urlu: escapeU, user: user};
     var page = info.page = Number(req.params.page || '1');
     var fallback = function(err) {
         console.log(err);
@@ -102,7 +105,8 @@ exports.send = function (req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
     var user = req.params.user;
-    var info = {title: name, name: name, secret: secret, user: user};
+    var escapeU = querystring.escape(user);
+    var info = {title: name, name: name, secret: secret, urlu: escapeU, user: user};
     var fallback = function(err) {
         console.log(err);
         req.flash('error', err);
@@ -127,7 +131,8 @@ exports.pullmesg = function(req, res) {
     var name = req.params.name;
     var secret = req.params.secret;
     var user = req.params.user;
-    var info = {title: name, name: name, secret: secret, user: user};
+    var escapeU = querystring.escape(user);
+    var info = {title: name, name: name, secret: secret, urlu: escapeU, user: user};
     if (!req.query.latest) return res.send({count: 0});
     var reqid = Number(req.query.latest);
     checkSecret(name, secret, function(err) {

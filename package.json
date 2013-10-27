@@ -13,6 +13,7 @@
     "connect-mongo": "*",
     "connect-flash": "*",
     "markdown": "*",
-    "moment": "*"
+    "moment": "*",
+    "querystring", "*"
   }
 }

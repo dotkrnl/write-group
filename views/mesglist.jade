@@ -1,10 +1,10 @@
 extends style
 
 block logo_link
-    a(href="/w/#{name}/#{secret}/#{user}/")#title #{website} #{title}
+    a(href="/w/#{name}/#{secret}/#{urlu}/")#title #{website} #{title}
 
 append content
-    form#form(action="#",method="post",name="form")
+    form#form(action="/w/#{name}/#{secret}/#{urlu}/send",method="post",name="form")
         input#contentbox(name="content", autocomplete="off")
         input.button.contentbutton(type="submit", value="write!", name="btn")
 
@@ -14,12 +14,12 @@ append content
 
     #lrnav_bar
         - if (page != 1)
-            a(href='/w/#{name}/#{secret}/#{user}/page/#{page-1}').lrnav << new
+            a(href='/w/#{name}/#{secret}/#{urlu}/page/#{page-1}').lrnav << new
         - if (page < totpage)
-            a(href='/w/#{name}/#{secret}/#{user}/page/#{page+1}').lrnav old >>
+            a(href='/w/#{name}/#{secret}/#{urlu}/page/#{page+1}').lrnav old >>
 
 append scripts
     if (latest != -1)
         script(src='/javascripts/mesg.js').
         script.
-            updater.setup("/w/#{name}/#{secret}/#{user}/mesg.json", "#{latest}");
+            updater.setup("/w/#{name}/#{secret}/#{urlu}/get", "#{latest}");
