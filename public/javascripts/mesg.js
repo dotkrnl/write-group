@@ -6,7 +6,7 @@ function $(x) {
 
 function createXHR() {
     var xhr;
-    if (window.ActiveXObject) {
+    if (!XMLHttpRequest) {
         try { xhr = new ActiveXObject("Microsoft.XMLHTTP"); }
         catch(e) { xhr = null; }
     } else xhr = new XMLHttpRequest();
@@ -64,8 +64,10 @@ document.form.onsubmit = function(e) {
     var params = "content=" + content;
     xhr.open("POST", server);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xhr.timeout = serverTimeout;
-    xhr.ontimeout = cbDone;
+    try {
+        xhr.timeout = serverTimeout;
+        xhr.ontimeout = cbDone;
+    } catch(e) {}
     xhr.send(params);
     return false;
 };
@@ -103,8 +105,10 @@ var updater = {
             }
         }
         var localtime = Number(Date.now());
-        xhr.timeout = serverTimeout;
-        if (cb) xhr.ontimeout = cb;
+        try {
+            xhr.timeout = serverTimeout;
+            if (cb) xhr.ontimeout = cb;
+        } catch(e) {}
         xhr.open("GET", updater.server + "?latest=" + updater.latest + "&localtime=" + localtime);
         xhr.send();
     }
