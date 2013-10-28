@@ -6,7 +6,7 @@ function $(x) {
 
 function createXHR() {
     var xhr;
-    if (!XMLHttpRequest) {
+    if (typeof XMLHttpRequest == 'undefined') {
         try { xhr = new ActiveXObject("Microsoft.XMLHTTP"); }
         catch(e) { xhr = null; }
     } else xhr = new XMLHttpRequest();
@@ -42,14 +42,14 @@ document.form.onsubmit = function(e) {
         document.form.content.disabled = true;
         document.form.btn.disabled = true;
         document.form.btn.value = "writing...";
-    }
+    };
     var cbDone = function() {
         document.form.content.disabled = false;
         document.form.btn.disabled = false;
         document.form.btn.value = "write!";
         document.form.content.focus();
         updater.refreshOnce();
-    }
+    };
     cbRunning();
     var xhr = createXHR();
     if (!xhr) return true;
@@ -68,7 +68,7 @@ document.form.onsubmit = function(e) {
     try {
         xhr.timeout = serverTimeout;
         xhr.ontimeout = cbDone;
-    } catch(e) {}
+    } catch(err) {}
     xhr.send(params);
     return false;
 };
