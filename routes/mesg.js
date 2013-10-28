@@ -151,12 +151,12 @@ exports.pullmesg = function(req, res) {
     var user = req.params.user;
     var escapeU = querystring.escape(user);
     var info = {title: name, name: name, secret: secret, urlu: escapeU, user: user};
-    if (!req.query.latest) return res.send({count: 0});
+    if (!req.query.latest) return res.send({err: null, count: 0, perpage: settings.perpage});
     var reqid = Number(req.query.latest);
     checkSecret(name, secret, function(err) {
-        if (err) return res.send({err: err, count: 0});
+        if (err) return res.send({err: err, count: 0, perpage: settings.perpage});
         renderMessages({group: name, id: {$gt: reqid}}, 0, settings.perpage, res, info, function(err, count, html, latest) {
-            return res.send({err: err, count: count, html: html, latest: count ? latest : reqid, request: reqid});
+            return res.send({err: err, count: count, html: html, latest: count ? latest : reqid, request: reqid, perpage: settings.perpage});
         });
     });
 }

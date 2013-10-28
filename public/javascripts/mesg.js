@@ -97,10 +97,12 @@ var updater = {
                 if (cb) cb();
                 if (xhr.responseText) {
                     var res = eval("(" + xhr.responseText + ")");
-                    if (res.count && res.request == updater.latest) {
+                    if (!res.err && res.count && res.request == updater.latest) {
                         var table = $("mesglist");
                         table.innerHTML = res.html + table.innerHTML;
                         updater.latest = res.latest;
+                        while (table.rows.length > res.perpage)
+                            table.deleteRow(-1);
                     }
                 }
             }
