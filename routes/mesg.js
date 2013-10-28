@@ -68,7 +68,7 @@ exports.redirect = function(req, res) {
         return res.redirect('back');
     } else {
         req.flash('error', 'Save this page to bookmarks for further writing.');
-        return res.redirect('/w/' + name + '/' + secret + '/' + user);
+        return res.redirect('/w/' + name + '/' + secret + '/' + escapeU);
     }
 };
 
