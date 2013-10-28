@@ -64,7 +64,7 @@ exports.redirect = function(req, res) {
     var user = req.body.user;
     var escapeU = querystring.escape(user);
     if (user == '') {
-        req.flash('error', 'Fullname needed');
+        req.flash('error', 'Name needed');
         return res.redirect('back');
     } else {
         req.flash('error', 'Save this page to bookmarks for further writing.');
