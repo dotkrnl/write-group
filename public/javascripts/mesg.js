@@ -22,11 +22,13 @@ document.form.onsubmit = function(e) {
         input.id = textarea.id = "contentbox";
         input.type = "text";
         input.setAttribute("autocomplete", "off");
-        var ori = document.form.content;
-        if (ori.tagName == "TEXTAREA") {
-            ori.parentNode.replaceChild(input, ori);
+        var origin = document.form.content;
+        if (origin.tagName == "TEXTAREA") {
+            origin.parentNode.replaceChild(input, origin);
+            $("textarea_br").className = 'hidden';
         } else {
-            ori.parentNode.replaceChild(textarea, ori);
+            origin.parentNode.replaceChild(textarea, origin);
+            $("textarea_br").className = '';
         }
         return false;
     }

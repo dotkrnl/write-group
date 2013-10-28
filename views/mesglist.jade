@@ -6,6 +6,7 @@ block logo_link
 append content
     form#form(action="/w/#{name}/#{secret}/#{urlu}/send",method="post",name="form")
         input#contentbox(name="content", autocomplete="off")
+        br.hidden#textarea_br
         input.button.contentbutton(type="submit", value="write!", name="btn")
 
     table.list
