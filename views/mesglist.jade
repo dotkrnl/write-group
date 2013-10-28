@@ -24,3 +24,6 @@ append scripts
         script(src='/javascripts/mesg.js').
         script.
             updater.setup("/w/#{name}/#{secret}/#{urlu}/get", "#{latest}");
+        //if lt IE 7
+            script.
+               document.form.onsubmit = null; 
