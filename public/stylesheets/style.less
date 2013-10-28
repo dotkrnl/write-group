@@ -63,6 +63,9 @@ h1, h2, h3 {
 
 p, pre {
     margin: 1em 0 1em 0;
+    @media screen and (max-width: @mobilescreen) {
+        margin: .5em 0 .5em 0;
+    }
 }
 
 input, textarea, select {
@@ -136,7 +139,10 @@ table {
 
 td {
     background: #f7f7f7;
-    padding: 0.9em;
+    padding: .9em 1.2em .9em 1.2em;
+    @media screen and (max-width: @mobilescreen) {
+        padding: .6em .8em .6em .8em;
+    }
 }
 
 .list_info_mine {
