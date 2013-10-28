@@ -32,7 +32,7 @@ var changeInputLayout = function() {
 
 document.form.onsubmit = function(e) {
     var content = document.form.content.value;
-    var server = document.form.action;
+    var server = document.form.action + '/send';
     if (!content) {
         changeInputLayout();
         return false;
@@ -52,6 +52,7 @@ document.form.onsubmit = function(e) {
     }
     cbRunning();
     var xhr = createXHR();
+    if (!xhr) return true;
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             cbDone();

@@ -4,7 +4,7 @@ block logo_link
     a(href="/w/#{name}/#{secret}/#{urlu}/")#title #{website} #{title}
 
 append content
-    form#form(action="/w/#{name}/#{secret}/#{urlu}/send",method="post",name="form")
+    form#form(action="/w/#{name}/#{secret}/#{urlu}",method="post",name="form")
         input#contentbox(name="content", autocomplete="off")
         br.hidden#textarea_br
         input.button.contentbutton(type="submit", value="write!", name="btn")

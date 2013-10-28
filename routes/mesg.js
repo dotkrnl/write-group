@@ -101,29 +101,47 @@ exports.show = function(req, res) {
     });
 };
 
-exports.send = function (req, res) {
+saveMessage = function (req, res, cb) {
     var name = req.params.name;
     var secret = req.params.secret;
     var user = req.params.user;
     var escapeU = querystring.escape(user);
     var info = {title: name, name: name, secret: secret, urlu: escapeU, user: user};
-    var fallback = function(err) {
-        console.log(err);
-        req.flash('error', err);
-        return res.send({err: err});
-    }
     checkSecret(name, secret, function(err) {
-        if (err) return fallback(err);
-        if (!req.body.content) return res.send({err: "No content"});
+        if (err) return cb(err);
+        if (!req.body.content) return cb("No content");
         mesg.findOne().sort('-id').exec(function(err, last) {
             var item = new mesg(req.body);
             item.id = last ? last.id + 1 : 0;
             item.author = user; item.group = name;
             item.save(function(err) {
-                if (err) fallback('Database error');
-                return res.send({err: null});
+                if (err) return cb('Database error');
+                return cb();
             });
         });
+    });
+};
+
+exports.send = function(req, res) {
+    var fallback = function(err) {
+        console.log(err);
+        req.flash('error', err);
+        return res.redirect('back');
+    };
+    saveMessage(req, res, function(err) {
+        if (err) return fallback(err);
+        else return res.redirect('back');
+    });
+};
+
+exports.sendmesg = function(req, res) {
+    var fallback = function(err) {
+        console.log(err);
+        return res.send({err: err});
+    };
+    saveMessage(req, res, function(err) {
+        if (err) return fallback(err);
+        else return res.send({err: null});
     });
 };
 
