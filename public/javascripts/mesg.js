@@ -103,6 +103,17 @@ var updater = {
                         updater.latest = res.latest;
                         while (table.rows.length > res.perpage)
                             table.deleteRow(-1);
+                        if (typeof window.Notification != 'undefined') {
+                            if (Notification.permission === 'default') {
+                                Notification.requestPermission();
+                            } else if (Notification.permission === 'granted'
+                                    && !document.hasFocus()) {
+                                var n = new Notification(
+                                    'New message',
+                                    { 'body' : res.newmesg }
+                                );
+                            }
+                        }
                     }
                 }
             }

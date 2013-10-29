@@ -39,7 +39,10 @@ var renderMessages = function(condition, skip, limit, res, info, cb) {
             var latest = mesglist[0] ? mesglist[0].id : 0;
             info.mesglist = getMessageInfo(mesglist);
             res.render('mesgsingles', info, function(err, html) {
-                return cb(null, mesglist.length, html, latest);
+                var newmesg = null;
+                if (mesglist.length) 
+                    newmesg = mesglist[0].author + ': ' + mesglist[0].content;
+                return cb(null, mesglist.length, html, latest, newmesg);
             });
         });
 };
@@ -91,7 +94,7 @@ exports.show = function(req, res) {
             info.totpage = Math.ceil(count / settings.perpage);
             var skip = settings.perpage * (page - 1);
 
-            renderMessages({group: name}, skip, settings.perpage, res, info, function(err, count, html, latest) {
+            renderMessages({group: name}, skip, settings.perpage, res, info, function(err, count, html, latest, newmesg) {
                 if (err) fallback(err);
                 info.latest = page == 1 ? latest : -1;
                 info.mesgsingles = html;
@@ -155,8 +158,8 @@ exports.pullmesg = function(req, res) {
     var reqid = Number(req.query.latest);
     checkSecret(name, secret, function(err) {
         if (err) return res.send({err: err, count: 0, perpage: settings.perpage});
-        renderMessages({group: name, id: {$gt: reqid}}, 0, settings.perpage, res, info, function(err, count, html, latest) {
-            return res.send({err: err, count: count, html: html, latest: count ? latest : reqid, request: reqid, perpage: settings.perpage});
+        renderMessages({group: name, id: {$gt: reqid}}, 0, settings.perpage, res, info, function(err, count, html, latest, newmesg) {
+            return res.send({err: err, count: count, html: html, latest: count ? latest : reqid, request: reqid, perpage: settings.perpage, newmesg: newmesg});
         });
     });
 }
