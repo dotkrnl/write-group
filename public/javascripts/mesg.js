@@ -100,11 +100,11 @@ var updater = {
                 if (xhr.responseText) {
                     var res = eval("(" + xhr.responseText + ")");
                     if (!res.err && res.count && res.request == updater.latest) {
-                        var table = $("mesglist");
-                        table.innerHTML = res.html + table.innerHTML;
+                        var mesglist = $("mesglist");
+                        mesglist.innerHTML = res.html + mesglist.innerHTML;
                         updater.latest = res.latest;
-                        while (table.rows.length > res.perpage) {
-                            table.deleteRow(-1);
+                        while (mesglist.childNodes.length > res.perpage) {
+                            mesglist.lastChild.parentNode.removeChild(mesglist.lastChild);
                         }
                         if (typeof window.Notification != 'undefined') {
                             if (Notification.permission === 'default') {
@@ -120,7 +120,7 @@ var updater = {
                     }
                 }
             }
-        }
+        };
         var localtime = Number(Date.now());
         try {
             xhr.timeout = serverTimeout;

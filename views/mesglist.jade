@@ -9,9 +9,8 @@ append content
         br.hidden#textarea_br
         input.button.contentbutton(type="submit", value="write!", name="btn")
 
-    table.list
-        tbody#mesglist
-            !{mesgsingles}
+    ul#mesglist
+        !{mesgsingles}
 
     #lrnav_bar
         - if (page != 1)
@@ -22,9 +21,5 @@ append content
 append scripts
     if (latest != -1)
         script(src='/javascripts/mesg.js').
-        //if lt IE 7
-            script.
-               document.form.onsubmit = null; 
-               updater.refreshOnce = function() {};
         script.
             updater.setup("/w/#{name}/#{secret}/#{urlu}/get", "#{latest}");

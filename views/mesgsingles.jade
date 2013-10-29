@@ -1,12 +1,11 @@
 for mesg in mesglist
-    tr.list_item
-        - if (mesg.author == user) 
-            td.list_info_mine
-                !{mesg.content}
-                .note= mesg.author
-                     @#{mesg.create}
-        - else
-            td.list_info
-                !{mesg.content}
-                .note= mesg.author
-                    @#{mesg.create}
+    - if (mesg.author == user) 
+        li.list_info.mine
+            !{mesg.content}
+            .note= mesg.author
+                 @#{mesg.create}
+    - else
+        li.list_info.other
+            !{mesg.content}
+            .note= mesg.author
+                @#{mesg.create}
