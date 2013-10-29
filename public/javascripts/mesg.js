@@ -4,6 +4,8 @@ function $(x) {
     return document.getElementById(x);
 }
 
+if (typeof Date.now == 'undefined') { Date.now = function() { return new Date().valueOf(); } }
+
 function createXHR() {
     var xhr;
     if (typeof XMLHttpRequest == 'undefined') {
