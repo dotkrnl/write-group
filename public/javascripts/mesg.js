@@ -11,7 +11,7 @@ function createXHR() {
     if (typeof XMLHttpRequest == 'undefined') {
         try { xhr = new ActiveXObject("Microsoft.XMLHTTP"); }
         catch(e) { xhr = null; }
-    } else xhr = new XMLHttpRequest();
+    } else { xhr = new XMLHttpRequest(); }
     return xhr;
 }
 
@@ -54,13 +54,13 @@ document.form.onsubmit = function(e) {
     };
     cbRunning();
     var xhr = createXHR();
-    if (!xhr) return true;
+    if (!xhr) { return true; }
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             cbDone();
             if (xhr.responseText) {
                 var res = eval("(" + xhr.responseText + ")");
-                if (!res.err) document.form.content.value = "";
+                if (!res.err) { document.form.content.value = ""; }
             }
         }
     };
@@ -96,15 +96,16 @@ var updater = {
         var xhr = createXHR();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
-                if (cb) cb();
+                if (cb) { cb(); }
                 if (xhr.responseText) {
                     var res = eval("(" + xhr.responseText + ")");
                     if (!res.err && res.count && res.request == updater.latest) {
                         var table = $("mesglist");
                         table.innerHTML = res.html + table.innerHTML;
                         updater.latest = res.latest;
-                        while (table.rows.length > res.perpage)
+                        while (table.rows.length > res.perpage) {
                             table.deleteRow(-1);
+                        }
                         if (typeof window.Notification != 'undefined') {
                             if (Notification.permission === 'default') {
                                 Notification.requestPermission();
@@ -123,7 +124,7 @@ var updater = {
         var localtime = Number(Date.now());
         try {
             xhr.timeout = serverTimeout;
-            if (cb) xhr.ontimeout = cb;
+            if (cb) { xhr.ontimeout = cb; }
         } catch(e) {}
         xhr.open("GET", updater.server + "?latest=" + updater.latest + "&localtime=" + localtime);
         xhr.send();
