@@ -64,7 +64,7 @@ document.form.onsubmit = function(e) {
             }
         }
     };
-    var params = "content=" + content;
+    var params = "content=" + encodeURIComponent(content);
     xhr.open("POST", server);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     try {
