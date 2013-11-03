@@ -10,7 +10,17 @@ append content
         input.button.contentbutton(type="submit", value="write!", name="btn")
 
     ul#mesglist
-        !{mesgsingles}
+        for mesg in mesglist
+            - if (mesg.author == user) 
+                li.list_info.mine
+                    !{mesg.content}
+                    .note= mesg.author
+                        @#{mesg.create}
+            - else
+                li.list_info.other
+                    !{mesg.content}
+                    .note= mesg.author
+                        @#{mesg.create}
 
     #lrnav_bar
         - if (page != 1)
@@ -19,7 +29,8 @@ append content
             a(href='/w/#{name}/#{secret}/#{urlu}/page/#{page+1}').lrnav old >>
 
 append scripts
-    if (latest != -1)
+    if (page == 1)
+        script(src='/socket.io/socket.io.js').
         script(src='/javascripts/mesg.js').
         script.
-            updater.setup("/w/#{name}/#{secret}/#{urlu}/get", "#{latest}");
+            updater.setup("#{name}", "#{secret}", "#{user}");

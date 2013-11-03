@@ -14,6 +14,7 @@
     "connect-flash": "*",
     "markdown": "*",
     "moment": "*",
-    "querystring": "*"
+    "querystring": "*",
+    "socket.io": "*"
   }
 }

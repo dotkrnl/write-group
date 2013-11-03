@@ -7,45 +7,8 @@
 var settings = require('../settings');
 var group = require('../models/group');
 var mesg = require('../models/mesg');
-var md = require('markdown').markdown.toHTML;
-var moment = require('moment');
 var querystring = require("querystring");
-
-var checkSecret = function(name, secret, cb) {
-    group.findOne({name: name}, function(err, found) {
-        if (err || !found) return cb('Group not found');
-        if (found.secret != secret) return cb('Bad secret');
-        return cb();
-    });
-};
-
-var getMessageInfo = function(mesglist, cb) {
-    var newlist = [];
-    mesglist.forEach(function(item) {
-        var newitem = {
-            content: md(item.content),
-            create: moment(item.create).format("MM/DD HH:mm"),
-            author: item.author,
-            id: item.id
-        }; newlist.push(newitem);
-    });
-    return newlist;
-};
-
-var renderMessages = function(condition, skip, limit, res, info, cb) {
-    mesg.find(condition).sort('-create').skip(skip).limit(limit)
-        .find(function(err, mesglist) {
-            if (err) cb(err);
-            var latest = mesglist[0] ? mesglist[0].id : 0;
-            info.mesglist = getMessageInfo(mesglist);
-            res.render('mesgsingles', info, function(err, html) {
-                var newmesg = null;
-                if (mesglist.length) 
-                    newmesg = mesglist[0].author + ': ' + mesglist[0].content;
-                return cb(null, mesglist.length, html, latest, newmesg);
-            });
-        });
-};
+var iolib = require("../socket/io");
 
 exports.welcome = function(req, res) {
     var name = req.params.name;
@@ -55,7 +18,7 @@ exports.welcome = function(req, res) {
         req.flash('error', err);
         return res.redirect('/');
     }
-    checkSecret(name, secret, function(err) {
+    group.checkSecret(name, secret, function(err) {
         if (err) return fallback(err);
         return res.render('mesgwelcome', info);
     });
@@ -70,7 +33,7 @@ exports.redirect = function(req, res) {
         req.flash('error', 'Name needed');
         return res.redirect('back');
     } else {
-        req.flash('error', 'Save this page to bookmarks for further writing.');
+        req.flash('success', 'Save this page to bookmarks for further writing.');
         return res.redirect('/w/' + name + '/' + secret + '/' + escapeU);
     }
 };
@@ -87,30 +50,29 @@ exports.show = function(req, res) {
         req.flash('error', err);
         return res.redirect('/');
     }
-    checkSecret(name, secret, function(err) {
+    group.checkSecret(name, secret, function(err) {
         if (err) return fallback(err);
         mesg.find({group: name}).count(function(err, count) {
             if (err) return fallback('Database error');
             info.totpage = Math.ceil(count / settings.perpage);
             var skip = settings.perpage * (page - 1);
-
-            renderMessages({group: name}, skip, settings.perpage, res, info, function(err, count, html, latest, newmesg) {
-                if (err) fallback(err);
-                info.latest = page == 1 ? latest : -1;
-                info.mesgsingles = html;
-                return res.render('mesglist', info);
-            });
+            mesg.find({group: name}).sort('-create').skip(skip).limit(settings.perpage)
+                .exec(function(err, mesglist) {
+                    if (err) fallback(err);
+                    info.mesglist = mesg.getNormalizedInfo(mesglist);
+                    return res.render('mesglist', info);
+                });
         });
     });
 };
 
-saveMessage = function (req, res, cb) {
+var saveMessage = function (req, res, cb) {
     var name = req.params.name;
     var secret = req.params.secret;
     var user = req.params.user;
     var escapeU = querystring.escape(user);
     var info = {title: name, name: name, secret: secret, urlu: escapeU, user: user};
-    checkSecret(name, secret, function(err) {
+    group.checkSecret(name, secret, function(err) {
         if (err) return cb(err);
         if (!req.body.content) return cb("No content");
         mesg.findOne().sort('-id').exec(function(err, last) {
@@ -119,6 +81,9 @@ saveMessage = function (req, res, cb) {
             item.author = user; item.group = name;
             item.save(function(err) {
                 if (err) return cb('Database error');
+                iolib.io.sockets.in(name).emit('message',
+                    { text: item.content, perpage: settings.perpage,
+                      mesg: mesg.getNormalizedInfo([item])[0] });
                 return cb();
             });
         });
@@ -148,18 +113,3 @@ exports.sendmesg = function(req, res) {
     });
 };
 
-exports.pullmesg = function(req, res) {
-    var name = req.params.name;
-    var secret = req.params.secret;
-    var user = req.params.user;
-    var escapeU = querystring.escape(user);
-    var info = {title: name, name: name, secret: secret, urlu: escapeU, user: user};
-    if (!req.query.latest) return res.send({err: null, count: 0, perpage: settings.perpage});
-    var reqid = Number(req.query.latest);
-    checkSecret(name, secret, function(err) {
-        if (err) return res.send({err: err, count: 0, perpage: settings.perpage});
-        renderMessages({group: name, id: {$gt: reqid}}, 0, settings.perpage, res, info, function(err, count, html, latest, newmesg) {
-            return res.send({err: err, count: count, html: html, latest: count ? latest : reqid, request: reqid, perpage: settings.perpage, newmesg: newmesg});
-        });
-    });
-}

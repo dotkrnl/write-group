@@ -4,8 +4,6 @@ function $(x) {
     return document.getElementById(x);
 }
 
-if (typeof Date.now == 'undefined') { Date.now = function() { return new Date().valueOf(); } }
-
 function createXHR() {
     var xhr;
     if (typeof XMLHttpRequest == 'undefined') {
@@ -50,7 +48,6 @@ document.form.onsubmit = function(e) {
         document.form.btn.disabled = false;
         document.form.btn.value = "write!";
         document.form.content.focus();
-        updater.refreshOnce();
     };
     cbRunning();
     var xhr = createXHR();
@@ -76,57 +73,40 @@ document.form.onsubmit = function(e) {
 };
 
 var updater = {
-    server: null,
-    latest: null,
-    interval: 5000,
+    name: null,
+    user: null,
+    socket: null,
 
-    setup: function(server, latest) {
-        updater.server = server;
-        updater.latest = latest;
-        updater.refresh();
+    setup: function(name, secret, user, latest) {
+        updater.name = name;
+        updater.user = user;
+        updater.socket = io.connect();
+        updater.socket.on('message', updater.newMessage);
+        updater.socket.emit('join', {name: name, secret: secret});
     },
 
-    refresh: function() {
-        updater.refreshOnce(function() {
-            setTimeout(updater.refresh, updater.interval);
-        });
-    },
-
-    refreshOnce: function(cb) {
-        var xhr = createXHR();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (cb) { cb(); }
-                if (xhr.responseText) {
-                    var res = eval("(" + xhr.responseText + ")");
-                    if (!res.err && res.count && res.request == updater.latest) {
-                        var mesglist = $("mesglist");
-                        mesglist.innerHTML = res.html + mesglist.innerHTML;
-                        updater.latest = res.latest;
-                        while (mesglist.childNodes.length > res.perpage) {
-                            mesglist.lastChild.parentNode.removeChild(mesglist.lastChild);
-                        }
-                        if (typeof window.Notification != 'undefined') {
-                            if (Notification.permission === 'default') {
-                                Notification.requestPermission();
-                            } else if (Notification.permission === 'granted'
-                                    && !document.hasFocus()) {
-                                var n = new Notification(
-                                    'New message',
-                                    { 'body' : res.newmesg }
-                                );
-                            }
-                        }
-                    }
-                }
+    newMessage: function(message) {
+        var mesglist = $("mesglist");
+        var liclass = 'list_info mine';
+        if (message.mesg.author != updater.user) {
+            liclass = 'list_info other';
+        }
+        mesglist.innerHTML = '<li class="' + liclass + '">' + message.mesg.content
+            + '<div class="note">' + message.mesg.author + '@' + message.mesg.create + '</div>'
+            + '</li>' + mesglist.innerHTML;
+        while (mesglist.childNodes.length > message.perpage) {
+            mesglist.lastChild.parentNode.removeChild(mesglist.lastChild);
+        }
+        if (typeof window.Notification != 'undefined') {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            } else if (Notification.permission === 'granted'
+                    && !document.hasFocus()) {
+                var n = new Notification(
+                    'New message from ' + message.mesg.author,
+                    { 'body' : message.text }
+                );
             }
-        };
-        var localtime = Number(Date.now());
-        try {
-            xhr.timeout = serverTimeout;
-            if (cb) { xhr.ontimeout = cb; }
-        } catch(e) {}
-        xhr.open("GET", updater.server + "?latest=" + updater.latest + "&localtime=" + localtime);
-        xhr.send();
+        }
     }
 };
