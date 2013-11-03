@@ -42,6 +42,10 @@ if ('development' == app.get('env')) {
 
 routes(app);
 
-http.createServer(app).listen(app.get('port'), app.get('host'), function(){
+var server = http.createServer(app);
+var io = require('./socket/io')(server);
+
+server.listen(app.get('port'), app.get('host'), function(){
     console.log('write-group server listening on port ' + app.get('port'));
 });
+
