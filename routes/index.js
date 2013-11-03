@@ -24,6 +24,16 @@ module.exports = function(app) {
 
     app.post('/w/:name/:secret/:user/send', mesg.sendmesg);
 
+    app.get('/p/:name', mesg.welcome);
+    app.post('/p/:name', mesg.redirect);
+
+    app.get('/p/:name/:user', mesg.show);
+    app.post('/p/:name/:user', mesg.send);
+    app.get('/p/:name/:user/page/:page(\\d+)', mesg.show);
+    app.post('/p/:name/:user/page/:page(\\d+)', mesg.send);
+
+    app.post('/p/:name/:user/send', mesg.sendmesg);
+
     app.get('/test', test);
     app.get('*', function(req, res){
         return res.render('homepage', {title: '404'});

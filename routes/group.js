@@ -23,6 +23,7 @@ exports.doNew = function (req, res) {
     res.locals.message.error = res.locals.message.error || [];
     group.normalize.normalizeAll(req.body,
         function(newinfo, errors) {
+            newinfo.type = req.body.type;
             var fallback = function(errors) {
                 errors.forEach(function(err) {
                     res.locals.message.error.push(err);
@@ -30,11 +31,15 @@ exports.doNew = function (req, res) {
                 return res.render('newgroup', {form: newinfo, title:'--new-group'});
             };
             if (errors) return fallback(errors);
-            newinfo.secret = mksecret();
+            if (req.body.type == 'public') newinfo.secret = 'public';
+            else newinfo.secret = mksecret();
             var item = new group(newinfo);
             item.save(function(err) {
                 if (err) return fallback(['Group name used']);
-                return res.redirect('/w/' + newinfo.name + '/' + newinfo.secret);
+                if (req.body.type != 'public')
+                    return res.redirect('/w/' + newinfo.name + '/' + newinfo.secret);
+                else
+                    return res.redirect('/p/' + newinfo.name);
             });
         });
 }

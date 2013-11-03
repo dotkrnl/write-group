@@ -34,7 +34,10 @@ exports.redirect = function(req, res) {
         return res.redirect('back');
     } else {
         req.flash('success', 'Save this page to bookmarks for further writing.');
-        return res.redirect('/w/' + name + '/' + secret + '/' + escapeU);
+        if (secret)
+            return res.redirect('/w/' + name + '/' + secret + '/' + escapeU);
+        else
+            return res.redirect('/p/' + name + '/' + escapeU);
     }
 };
 

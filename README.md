@@ -7,7 +7,7 @@ demo
 ----
 **create group**: http://wg.dotkrnl.com/
 
-**public group**: http://wg.dotkrnl.com/w/public/bawsZty0/
+**public group**: http://wg.dotkrnl.com/p/public
 
 contributor
 -----------

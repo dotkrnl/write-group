@@ -1,13 +1,22 @@
 extends style
 
 block logo_link
-    a(href="/w/#{name}/#{secret}/#{urlu}/")#title #{website} #{title}
+    - if (secret)
+        a(href="/w/#{name}/#{secret}/#{urlu}/")#title #{website} #{title}
+    - else
+        a(href="/p/#{name}/#{urlu}/")#title #{website} #{title}
 
 append content
-    form#form(action="/w/#{name}/#{secret}/#{urlu}",method="post",name="form")
-        input#contentbox(name="content", autocomplete="off")
-        br.hidden#textarea_br
-        input.button.contentbutton(type="submit", value="write!", name="btn")
+    - if (secret)
+        form#form(action="/w/#{name}/#{secret}/#{urlu}",method="post",name="form")
+            input#contentbox(name="content", autocomplete="off")
+            br.hidden#textarea_br
+            input.button.contentbutton(type="submit", value="write!", name="btn")
+    - else
+        form#form(action="/p/#{name}/#{urlu}",method="post",name="form")
+            input#contentbox(name="content", autocomplete="off")
+            br.hidden#textarea_br
+            input.button.contentbutton(type="submit", value="write!", name="btn")
 
     ul#mesglist
         for mesg in mesglist
@@ -24,13 +33,23 @@ append content
 
     #lrnav_bar
         - if (page != 1)
-            a(href='/w/#{name}/#{secret}/#{urlu}/page/#{page-1}').lrnav << new
+            - if (secret)
+                a(href='/w/#{name}/#{secret}/#{urlu}/page/#{page-1}').lrnav << new
+            - else
+                a(href='/p/#{name}/#{urlu}/page/#{page-1}').lrnav << new
         - if (page < totpage)
-            a(href='/w/#{name}/#{secret}/#{urlu}/page/#{page+1}').lrnav old >>
+            - if (secret)
+                a(href='/w/#{name}/#{secret}/#{urlu}/page/#{page+1}').lrnav old >>
+            - else
+                a(href='/p/#{name}/#{urlu}/page/#{page+1}').lrnav old >>
 
 append scripts
     if (page == 1)
         script(src='/socket.io/socket.io.js').
         script(src='/javascripts/mesg.js').
-        script.
-            updater.setup("#{name}", "#{secret}", "#{user}");
+        - if (secret)
+            script.
+                updater.setup("#{name}", "#{secret}", "#{user}");
+        - else
+            script.
+                updater.setup("#{name}", "public", "#{user}");

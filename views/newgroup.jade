@@ -11,5 +11,17 @@ block content
             input#email(type="text", value="#{form.email || ''}", name="email")
 
         div
+            label Type
+            select#type(name="type")
+                - if (form.type == 'private')
+                    option(value="private", selected="selected") Private
+                - else
+                    option(value="private") Private
+                - if (form.type == 'public')
+                    option(value="public", selected="selected") Public
+                - else
+                    option(value="public") Public
+
+        div
             input.button(type="submit", value="Write!")
 
