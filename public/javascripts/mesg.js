@@ -82,7 +82,7 @@ var updater = {
         updater.user = user;
         updater.socket = io.connect();
         updater.socket.on('message', updater.newMessage);
-        updater.socket.emit('join', {name: name, secret: secret});
+        updater.socket.emit('join', {name: name, secret: secret, user: user});
     },
 
     newMessage: function(message) {
