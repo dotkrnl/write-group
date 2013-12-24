@@ -22,3 +22,16 @@ module.exports.getNormalizedInfo = function(mesglist, cb) {
     });
     return newlist;
 };
+
+module.exports.getRawInfo = function(mesglist, cb) {
+    var newlist = [];
+    mesglist.forEach(function(item) {
+        var newitem = {
+            content: item.content,
+            create: moment(item.create).format("YYYY/MM/DD HH:mm:ss"),
+            author: item.author,
+            id: item.id
+        }; newlist.push(newitem);
+    });
+    return newlist;
+};

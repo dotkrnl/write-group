@@ -116,3 +116,19 @@ exports.sendmesg = function(req, res) {
     });
 };
 
+exports.getmesg = function(req, res) {
+    var name = req.params.name;
+    var secret = req.params.secret;
+    if (!req.query.last) req.query.last = 0;
+    group.checkSecret(name, secret, function(err) {
+        if (err) return res.send({err: err, data: []});
+        mesg.find({group: name, id: {$gt: req.query.last}})
+            .sort('create').exec(function(err, mesgs) {
+                if (err) return res.send({err: err, data: []});
+                else {
+                    var mesglist = mesg.getRawInfo(mesgs);
+                    return res.send({err: null, data: mesglist});
+                }
+            });
+    });
+};

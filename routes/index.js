@@ -23,6 +23,7 @@ module.exports = function(app) {
     app.post('/w/:name/:secret/:user/page/:page(\\d+)', mesg.send);
 
     app.post('/w/:name/:secret/:user/send', mesg.sendmesg);
+    app.get('/w/:name/:secret/:user/get', mesg.getmesg);
 
     app.get('/p/:name', mesg.welcome);
     app.post('/p/:name', mesg.redirect);
@@ -33,6 +34,7 @@ module.exports = function(app) {
     app.post('/p/:name/:user/page/:page(\\d+)', mesg.send);
 
     app.post('/p/:name/:user/send', mesg.sendmesg);
+    app.get('/p/:name/:user/get', mesg.getmesg);
 
     app.get('/test', test);
     app.get('*', function(req, res){
