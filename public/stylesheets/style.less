@@ -62,11 +62,14 @@ h1, h2, h3 {
 }
 
 p, pre {
-    word-wrap: break-word; 
     margin: 1em 0 1em 0;
     @media screen and (max-width: @mobilescreen) {
         margin: .5em 0 .5em 0;
     }
+}
+
+p, div {
+    word-wrap: break-word; 
 }
 
 input, textarea, select {
