@@ -3,12 +3,10 @@
  * News model library
  */
 
-var db = require('../db');
 var md = require('markdown').markdown.toHTML;
 var moment = require('moment');
-var schema = require('./schema');
 
-module.exports = db.model('Mesg', schema);
+module.exports = { };
 
 module.exports.getNormalizedInfo = function(mesglist, cb) {
     var newlist = [];

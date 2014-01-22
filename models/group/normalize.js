@@ -31,7 +31,7 @@ exports.normalizer = {
 exports.normalizeAll = function(origin, cb) {
     var errors = [];
     var result = {};
-    genProcessGet = function(key) {
+    var genProcessGet = function(key) {
         return function(dest, err) {
             result[key] = dest;
             if (err) errors.push(err);

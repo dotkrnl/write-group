@@ -24,6 +24,7 @@ exports.doNew = function (req, res) {
     group.normalize.normalizeAll(req.body,
         function(newinfo, errors) {
             newinfo.type = req.body.type;
+            newinfo.create = new Date();
             var fallback = function(errors) {
                 errors.forEach(function(err) {
                     res.locals.message.error.push(err);
@@ -33,8 +34,7 @@ exports.doNew = function (req, res) {
             if (errors) return fallback(errors);
             if (req.body.type == 'public') newinfo.secret = 'public';
             else newinfo.secret = mksecret();
-            var item = new group(newinfo);
-            item.save(function(err) {
+            req.models.group.create([newinfo], function(err) {
                 if (err) return fallback(['Group name used']);
                 if (req.body.type != 'public')
                     return res.redirect('/w/' + newinfo.name + '/' + newinfo.secret);

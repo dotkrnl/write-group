@@ -3,17 +3,15 @@
  * Group model library
  */
 
-var db = require('../db');
-var schema = require('./schema');
-
-module.exports = db.model('Group', schema);
+module.exports = { };
 module.exports.normalize = require('./normalize');
 
 module.exports.checkSecret = function(name, secret, cb) {
-    module.exports.findOne({name: name}, function(err, found) {
-        if (err || !found) return cb('Group not found');
-        if (found.secret == 'public') return cb();
-        if (found.secret != secret) return cb('Bad secret');
+    var group = require('../db').db.models.wg_group;
+    group.find({name: name}, 1, function(err, found) {
+        if (err || !found[0]) return cb('Group not found');
+        if (found[0].secret == 'public') return cb();
+        if (found[0].secret != secret) return cb('Bad secret');
         return cb();
     });
 };

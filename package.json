@@ -1,6 +1,6 @@
 {
   "name": "write-group",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "node app.js"
@@ -9,12 +9,12 @@
     "express": "3.3.7",
     "jade": "*",
     "less-middleware": "*",
-    "mongoose": "*",
-    "connect-mongo": "*",
+    "orm": "*",
+    "pg": "*",
+    "connect-pg": "*",
     "connect-flash": "*",
     "markdown": "*",
     "moment": "*",
-    "querystring": "*",
     "socket.io": "*"
   }
 }

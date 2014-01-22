@@ -7,8 +7,9 @@
 var settings = require('../settings');
 var group = require('../models/group');
 var mesg = require('../models/mesg');
-var querystring = require("querystring");
-var iolib = require("../socket/io");
+var querystring = require('querystring');
+var iolib = require('../socket/io');
+var orm = require('orm');
 
 exports.welcome = function(req, res) {
     var name = req.params.name;
@@ -55,12 +56,13 @@ exports.show = function(req, res) {
     }
     group.checkSecret(name, secret, function(err) {
         if (err) return fallback(err);
-        mesg.find({group: name}).count(function(err, count) {
+        req.models.mesg.count({group: name}, function(err, count) {
             if (err) return fallback('Database error');
             info.totpage = Math.ceil(count / settings.perpage);
             var skip = settings.perpage * (page - 1);
-            mesg.find({group: name}).sort('-create').skip(skip).limit(settings.perpage)
-                .exec(function(err, mesglist) {
+            req.models.mesg.find({group: name}, { offset: skip },
+                settings.perpage, '-id',
+                function(err, mesglist) {
                     if (err) fallback(err);
                     info.mesglist = mesg.getNormalizedInfo(mesglist);
                     return res.render('mesglist', info);
@@ -78,11 +80,12 @@ var saveMessage = function (req, res, cb) {
     group.checkSecret(name, secret, function(err) {
         if (err) return cb(err);
         if (!req.body.content) return cb("No content");
-        mesg.findOne().sort('-id').exec(function(err, last) {
-            var item = new mesg(req.body);
-            item.id = last ? last.id + 1 : 0;
+        req.models.mesg.find({}).order('-id').limit(1).run(function(err, last) {
+            var item = req.body;
+            item.id = err ? 0 : (last[0] ? last[0].id + 1 : 0);
             item.author = user; item.group = name;
-            item.save(function(err) {
+            item.create = new Date();
+            req.models.mesg.create([item], function(err, items) {
                 if (err) return cb('Database error');
                 iolib.io.sockets.in(name).emit('message',
                     { text: item.content, perpage: settings.perpage,
@@ -122,13 +125,13 @@ exports.getmesg = function(req, res) {
     if (!req.query.last) req.query.last = 0;
     group.checkSecret(name, secret, function(err) {
         if (err) return res.send({err: err, data: []});
-        mesg.find({group: name, id: {$gt: req.query.last}})
-            .sort('create').exec(function(err, mesgs) {
-                if (err) return res.send({err: err, data: []});
-                else {
-                    var mesglist = mesg.getRawInfo(mesgs);
-                    return res.send({err: null, data: mesglist});
-                }
-            });
+        mesg.find({group: name, id: orm.gt(req.query.last)},
+                'create', function(err, mesgs) {
+            if (err) return res.send({err: err, data: []});
+            else {
+                var mesglist = mesg.getRawInfo(mesgs);
+                return res.send({err: null, data: mesglist});
+            }
+        });
     });
 };

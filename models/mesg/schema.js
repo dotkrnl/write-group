@@ -1,15 +1,12 @@
 
 /**
- * News model schema
+ * Mesg model schema
  */
 
-var db = require('../db');
-var Schema = db.Schema;
-
-module.exports = new Schema({
-    author: String,
-    content: String,
-    create: {type: Date, default: Date.now, index: true},
-    group: {type: String, index: true},
-    id: {type: Number, index: {unique: true}},
-});
+module.exports = {
+    author: { type: 'text', require: true },
+    content: { type: 'text', require: true, big: true },
+    create: { type: 'date', require: true, time: true },
+    group: { type: 'text', require: true },
+    id: { type: 'number', require: true, unique: true },
+};

@@ -4,7 +4,6 @@
  */
 
 var iolib = require('socket.io');
-
 var group = require('../models/group');
 
 module.exports = function(server) {

@@ -6,6 +6,7 @@
 var express = require('express');
 var settings = require('./settings');
 var routes = require('./routes');
+var models = require('./models/db');
 var http = require('http');
 var path = require('path');
 var flash = require('connect-flash');
@@ -21,6 +22,7 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser(settings.secret));
+app.use(models);
 app.use(express.session(settings.sessionDB));
 app.use(flash());
 app.use(function(req, res, next) {
