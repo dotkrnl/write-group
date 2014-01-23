@@ -125,8 +125,8 @@ exports.getmesg = function(req, res) {
     if (!req.query.last) req.query.last = 0;
     group.checkSecret(name, secret, function(err) {
         if (err) return res.send({err: err, data: []});
-        mesg.find({group: name, id: orm.gt(req.query.last)},
-                'create', function(err, mesgs) {
+        req.models.mesg.find({group: name, id: orm.gt(req.query.last)},
+                'id', function(err, mesgs) {
             if (err) return res.send({err: err, data: []});
             else {
                 var mesglist = mesg.getRawInfo(mesgs);
