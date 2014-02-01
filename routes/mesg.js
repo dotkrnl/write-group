@@ -34,7 +34,7 @@ exports.redirect = function(req, res) {
         req.flash('error', 'Name needed');
         return res.redirect('back');
     } else {
-        req.flash('success', 'Save this page to bookmarks for further writing.');
+        req.flash('success', 'Save this page to bookmarks for future writing.');
         if (secret)
             return res.redirect('/w/' + name + '/' + secret + '/' + escapeU);
         else
