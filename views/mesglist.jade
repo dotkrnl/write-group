@@ -47,12 +47,19 @@ append content
                 a(href='/p/#{name}/#{urlu}/page/#{page+1}').lrnav old >>
 
 append scripts
+    script(src='/socket.io/socket.io.js').
+    script(src='/javascripts/mesg.js').
     if (page == 1)
-        script(src='/socket.io/socket.io.js').
-        script(src='/javascripts/mesg.js').
         - if (secret)
             script.
-                updater.setup("#{name}", "#{secret}", "#{user}");
+                updater.setup("#{name}", "#{secret}", "#{user}", false);
         - else
             script.
-                updater.setup("#{name}", "public", "#{user}");
+                updater.setup("#{name}", "public", "#{user}", false);
+    else
+        - if (secret)
+            script.
+                updater.setup("#{name}", "#{secret}", "#{user}", true);
+        - else
+            script.
+                updater.setup("#{name}", "public", "#{user}", true);

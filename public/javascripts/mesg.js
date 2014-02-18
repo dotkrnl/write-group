@@ -74,15 +74,17 @@ document.form.onsubmit = function(e) {
     return false;
 };
 
-var updater = {
+updater = {
     name: null,
     user: null,
     socket: null,
+    nonew: null,
 
-    setup: function(name, secret, user, latest) {
+    setup: function(name, secret, user, nonew) {
         setForm(true);
         updater.name = name;
         updater.user = user;
+        updater.nonew = nonew;
         updater.socket = io.connect();
         updater.socket.on('message', updater.newMessage);
         updater.socket.on('connect', function() {
@@ -97,16 +99,18 @@ var updater = {
     },
 
     newMessage: function(message) {
-        var mesglist = $("mesglist");
-        var liclass = 'list_info mine';
-        if (message.mesg.author != updater.user) {
-            liclass = 'list_info other';
-        }
-        mesglist.innerHTML = '<li class="' + liclass + '">' + message.mesg.content
-            + '<div class="note">' + message.mesg.author + '@' + message.mesg.create + '</div>'
-            + '</li>' + mesglist.innerHTML;
-        while (mesglist.childNodes.length > message.perpage) {
-            mesglist.lastChild.parentNode.removeChild(mesglist.lastChild);
+        if (!updater.nonew) {
+            var mesglist = $("mesglist");
+            var liclass = 'list_info mine';
+            if (message.mesg.author != updater.user) {
+                liclass = 'list_info other';
+            }
+            mesglist.innerHTML = '<li class="' + liclass + '">' + message.mesg.content
+                + '<div class="note">' + message.mesg.author + '@' + message.mesg.create + '</div>'
+                + '</li>' + mesglist.innerHTML;
+            while (mesglist.childNodes.length > message.perpage) {
+                mesglist.lastChild.parentNode.removeChild(mesglist.lastChild);
+            }
         }
         if (typeof window.Notification != 'undefined') {
             if (Notification.permission === 'default') {
