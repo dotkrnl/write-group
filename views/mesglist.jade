@@ -6,6 +6,9 @@ block logo_link
     - else
         a(href="/p/#{name}/#{urlu}/")#title #{website} #{title}
 
+append notification
+    div.message#offline OFFLINE
+
 append content
     - if (secret)
         form#form(action="/w/#{name}/#{secret}/#{urlu}",method="post",name="form")

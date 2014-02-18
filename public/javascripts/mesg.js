@@ -13,7 +13,7 @@ function createXHR() {
     return xhr;
 }
 
-var changeInputLayout = function() {
+function changeInputLayout() {
     var textarea = document.createElement("textarea");
     var input = document.createElement("input");
     input.name = textarea.name = "content";
@@ -30,6 +30,11 @@ var changeInputLayout = function() {
     }
 }
 
+function setForm(val) {
+    document.form.content.disabled = val;
+    document.form.btn.disabled = val;
+}
+
 document.form.onsubmit = function(e) {
     var content = document.form.content.value;
     var server = document.form.action + '/send';
@@ -38,15 +43,12 @@ document.form.onsubmit = function(e) {
         return false;
     }
     var cbRunning = function() {
-        document.form.content.focus();
-        document.form.content.disabled = true;
-        document.form.btn.disabled = true;
         document.form.btn.value = "writing...";
+        setForm(true);
     };
     var cbDone = function() {
-        document.form.content.disabled = false;
-        document.form.btn.disabled = false;
         document.form.btn.value = "write!";
+        setForm(false);
         document.form.content.focus();
     };
     cbRunning();
@@ -78,11 +80,20 @@ var updater = {
     socket: null,
 
     setup: function(name, secret, user, latest) {
+        setForm(true);
         updater.name = name;
         updater.user = user;
         updater.socket = io.connect();
         updater.socket.on('message', updater.newMessage);
-        updater.socket.emit('join', {name: name, secret: secret});
+        updater.socket.on('connect', function() {
+            $('offline').className += ' hidden';
+            setForm(false);
+            updater.socket.emit('join', {name: name, secret: secret});
+        });
+        updater.socket.on('disconnect', function() {
+            $('offline').className = $('offline').className.replace(/\bhidden\b/,'');
+            setForm(true);
+        });
     },
 
     newMessage: function(message) {
